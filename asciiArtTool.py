@@ -56,6 +56,9 @@ drawn_image = None
 last_image_path = None
 last_drawn_image = None
 
+# Add a variable for ASCII resolution (width)
+ascii_width_var = None  # will be set after root is created
+
 # --- Main Conversion Logic ---
 
 def apply_all_filters(image):
@@ -79,7 +82,11 @@ def convert_image_to_ascii(image_path=None, new_width=100, pil_image=None):
         image = pil_image if pil_image is not None else Image.open(image_path)
     except Exception:
         return "Error: Unable to open image file."
-    image = resize_image(image, new_width)
+    # Use the value from the resolution slider if available
+    width = new_width
+    if ascii_width_var is not None:
+        width = ascii_width_var.get()
+    image = resize_image(image, width)
     image = apply_all_filters(image)
     image = grayify(image)
     ascii_str = pixels_to_ascii(image)
@@ -94,7 +101,7 @@ def open_image():
     global last_image_path, last_drawn_image
     file_path = filedialog.askopenfilename()
     if file_path:
-        ascii_art = convert_image_to_ascii(file_path, new_width=100)
+        ascii_art = convert_image_to_ascii(file_path)
         textBox.delete(1.0, tk.END)
         textBox.insert(tk.END, ascii_art)
         last_image_path = file_path
@@ -103,11 +110,11 @@ def open_image():
 def update_and_refresh(*args):
     """Live update ASCII art when filters or parameters change."""
     if last_drawn_image is not None:
-        ascii_art = convert_image_to_ascii(pil_image=last_drawn_image, new_width=100)
+        ascii_art = convert_image_to_ascii(pil_image=last_drawn_image)
         textBox.delete(1.0, tk.END)
         textBox.insert(tk.END, ascii_art)
     elif last_image_path is not None:
-        ascii_art = convert_image_to_ascii(last_image_path, new_width=100)
+        ascii_art = convert_image_to_ascii(last_image_path)
         textBox.delete(1.0, tk.END)
         textBox.insert(tk.END, ascii_art)
 
@@ -259,6 +266,21 @@ main_frame.pack(fill=tk.BOTH, expand=True)
 
 filtersFrame = tk.Frame(main_frame, bg="#101010", highlightbackground="#00FF00", highlightthickness=2)
 filtersFrame.pack(side=tk.LEFT, fill=tk.Y, padx=(10, 0), pady=10)
+
+# Add resolution slider above filters
+resolutionFrame = tk.Frame(filtersFrame, bg="#101010")
+resolutionFrame.pack(fill=tk.X, pady=(0, 10))
+tk.Label(resolutionFrame, text="Resolution:", bg="#101010", fg="#00FF00").pack(side=tk.LEFT, padx=(5, 5))
+ascii_width_var = tk.IntVar(value=100)
+def on_resolution_change(val):
+    update_and_refresh()
+resolution_slider = tk.Scale(
+    resolutionFrame, from_=30, to=200, orient=tk.HORIZONTAL, variable=ascii_width_var,
+    bg="#101010", fg="#00FF00", troughcolor="#003300", highlightbackground="#00FF00",
+    activebackground="#00FF00", length=120, width=10, sliderrelief=tk.FLAT,
+    command=on_resolution_change
+)
+resolution_slider.pack(side=tk.LEFT, padx=(0, 10))
 
 outputFrame = tk.Frame(main_frame, bg="#101010")
 outputFrame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(10, 10), pady=10)
