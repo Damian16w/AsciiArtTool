@@ -7,7 +7,7 @@ Ascii Art Tool made by DrJunkHoofd to create Ascii art with ease!
 - **Image to ASCII**: Load any image and instantly convert it to ASCII art.
 - **Live Filters**: Adjust grayscale, invert, blur, brightness, and contrast with real-time preview.
 - **Draw Mode**: Create your own image with a brush/eraser and variable thickness.
-- **Matrix Theme**: Green-on-black UI inspired by The Matrix.
+- **Dark mode theme** Easy on your eyes black and green theme (totally not inspired by the Matrix)
 - **Copy to Clipboard**: One-click copy of your ASCII masterpiece.
 - **Responsive Layout**: Filters panel on the left, output on the right.
 
