@@ -1,5 +1,11 @@
-# ASCII Art Tool By DrJunkHoofd
-Ascii Art Tool made by DrJunkHoofd to create Ascii art with ease!
+# ASCII Art Tool - Matrix Edition
+
+<p align="center">
+  <img src="ASCIILogo.png" alt="ASCII Logo" width="580"/>
+</p>
+
+A stylish, interactive tool for converting images to ASCII art, with live filter controls and a Matrix-inspired look. Draw your own images, tweak filters, and copy the result with ease!
+
 ---
 
 ## Features

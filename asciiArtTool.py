@@ -131,8 +131,15 @@ def open_draw_window():
     drawWin.configure(bg="#101010")
     drawWin.geometry(f"{canvas_width+20}x{canvas_height+90}")
 
-    canvas = tk.Canvas(drawWin, width=canvas_width, height=canvas_height, bg="#101010", highlightbackground="#00FF00")
-    canvas.pack()
+    # Make the draw window and canvas resizable
+    drawWin.rowconfigure(1, weight=1)
+    drawWin.columnconfigure(0, weight=1)
+
+    # Canvas frame for proper resizing
+    canvas_frame = tk.Frame(drawWin, bg="#101010")
+    canvas_frame.grid(row=1, column=0, sticky="nsew")
+    canvas = tk.Canvas(canvas_frame, width=canvas_width, height=canvas_height, bg="#101010", highlightbackground="#00FF00")
+    canvas.pack(fill=tk.BOTH, expand=True)
 
     img = Image.new("L", (canvas_width, canvas_height), 255)
     draw = ImageDraw.Draw(img)
@@ -140,7 +147,7 @@ def open_draw_window():
 
     # Brush controls
     controls = tk.Frame(drawWin, bg="#101010")
-    controls.pack(pady=5)
+    controls.grid(row=0, column=0, pady=5, sticky="ew")
 
     brush_size_var = tk.IntVar(value=3)
     eraser_mode = tk.BooleanVar(value=False)
@@ -204,13 +211,39 @@ def open_draw_window():
         drawWin, text="Convert to ASCII", command=save_and_convert,
         bg="#101010", fg="#00FF00", activebackground="#00FF00", activeforeground="#101010", highlightbackground="#00FF00"
     )
-    btn_save.pack(pady=5)
+    btn_save.grid(row=2, column=0, pady=5)
+
+    # Handle resizing: update canvas size and PIL image
+    def on_resize(event):
+        new_w = max(10, event.width)
+        new_h = max(10, event.height)
+        # Resize the canvas widget
+        canvas.config(width=new_w, height=new_h)
+        # Resize the PIL image and drawing context
+        nonlocal img, draw
+        old_img = img
+        img = old_img.resize((new_w, new_h))
+        draw = ImageDraw.Draw(img)
+        # Redraw the canvas background
+        canvas.delete("all")
+
+    canvas.bind("<Configure>", on_resize)
 
 # --- GUI Setup ---
 
 root = tk.Tk()
 root.title("ASCII Art Tool - Matrix Edition")
 root.configure(bg="#101010")
+
+# Set window icon (favicon) using PNG (works for Tk >= 8.6)
+try:
+    import sys
+    from PIL import ImageTk
+    logo_img = Image.open("ASCIILogo2.png")
+    logo_tk = ImageTk.PhotoImage(logo_img)
+    root.iconphoto(True, logo_tk)
+except Exception:
+    pass  # Ignore if icon file is missing or incompatible
 
 active_filters = {
     "Grayscale": tk.BooleanVar(value=False, master=root),
